@@ -26,8 +26,26 @@ impl fmt::Display for TaskError {
         }
     }
 }
-
 impl std::error::Error for TaskError {}
+#[derive(Debug, PartialEq)]
+pub enum CommandError<'a> {
+    CommandNotFound(&'a str),
+    WrongArgument(&'a str),
+}
+impl<'a> fmt::Display for CommandError<'a> {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            CommandError::CommandNotFound(command) => {
+                write!(formatter, "Invalid command: {}", command)
+            }
+            CommandError::WrongArgument(arg) => {
+                write!(formatter, "Invalid arguments: {}", arg)
+            }
+        }
+    }
+}
+impl<'a> std::error::Error for CommandError<'a> {}
+
 #[cfg(test)]
 mod tests {
     use super::*;

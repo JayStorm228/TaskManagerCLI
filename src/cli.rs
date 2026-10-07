@@ -1,10 +1,46 @@
-use crate::{errors::TaskError, taskmanager::TaskManager};
+use std::process::exit;
+
+use crate::{command::Command, errors::TaskError, taskmanager::TaskManager};
 
 pub struct Cli {
-    pub task_mgr: TaskManager,
+    task_mgr: TaskManager,
 }
 impl Cli {
-    pub fn new_task(&mut self, title: String, description: String) -> Result<(), TaskError> {
+    pub fn new() -> Self {
+        Self {
+            task_mgr: TaskManager::new(),
+        }
+    }
+    pub fn execute(&mut self, command: Command) -> Result<(), TaskError> {
+        match command {
+            Command::Add { title, description } => {
+                self.new_task(title, description)?;
+                Ok(())
+            }
+            Command::Complete { id } => {
+                self.complete_task(id)?;
+                Ok(())
+            }
+            Command::Delete { id } => {
+                self.delete_task(id);
+                Ok(())
+            }
+            Command::Exit => exit(0),
+            Command::Help => {
+                Cli::help();
+                Ok(())
+            }
+            Command::List => {
+                self.list_tasks();
+                Ok(())
+            }
+            Command::Show { id } => {
+                self.show_task(id);
+                Ok(())
+            }
+        }
+    }
+    fn new_task(&mut self, title: String, description: String) -> Result<(), TaskError> {
         println!("Trying to add task");
         println!("Title: {title}, description:\n{description}");
 
@@ -13,7 +49,7 @@ impl Cli {
         println!("\u{2713} Success!");
         Ok(())
     }
-    pub fn show_task(&self, id: u32) -> Result<(), TaskError> {
+    fn show_task(&self, id: u32) -> Result<(), TaskError> {
         let task = self.task_mgr.search_id(id)?;
         println!("\n====== Task {}:{} ======", task.id, task.title);
         println!("{}", task.description);
@@ -26,11 +62,11 @@ impl Cli {
         println!("==========================\n");
         Ok(())
     }
-    pub fn list_tasks(&self) {
-        if self.task_mgr.tasks.is_empty() {
+    fn list_tasks(&self) {
+        if self.task_mgr.tasks().is_empty() {
             println!("No tasks!")
         } else {
-            for task in self.task_mgr.tasks.iter() {
+            for task in self.task_mgr.tasks().iter() {
                 if task.is_completed {
                     println!("[{}] - {} - \u{2713}", task.id, task.title)
                 } else {
@@ -40,19 +76,19 @@ impl Cli {
             println!("For more information consider using \"taskmanager show <id>\"")
         }
     }
-    pub fn delete_task(&mut self, id: u32) -> Result<(), TaskError> {
+    fn delete_task(&mut self, id: u32) -> Result<(), TaskError> {
         let task = self.task_mgr.search_id(id)?;
         println!("Deleting task:\n{}--{}", task.id, task.title);
         self.task_mgr.delete(id)?;
         Ok(())
     }
-    pub fn complete_task(&mut self, id: u32) -> Result<(), TaskError> {
+    fn complete_task(&mut self, id: u32) -> Result<(), TaskError> {
         let task = self.task_mgr.search_id(id)?;
         println!("Task Comlpete:\n{}--{}", task.id, task.title);
         self.task_mgr.complete(id)?;
         Ok(())
     }
-    pub fn help() {
+    fn help() {
         println!("{:<10} {:<24} {}", "Command", "Arguments", "Description");
 
         println!("{}", "-".repeat(80));
@@ -105,7 +141,7 @@ mod tests {
         let mut cli = create_cli();
         let res = cli.new_task("Title".to_string(), "Description".to_string());
         assert!(res.is_ok());
-        assert_eq!(cli.task_mgr.tasks.len(), 1);
+        assert_eq!(cli.task_mgr.tasks().len(), 1);
     }
 
     #[test]
@@ -115,7 +151,7 @@ mod tests {
             .unwrap();
 
         assert!(cli.complete_task(0).is_ok());
-        assert!(cli.task_mgr.tasks[0].is_completed);
+        assert!(cli.task_mgr.tasks()[0].is_completed);
     }
 
     #[test]
@@ -125,7 +161,7 @@ mod tests {
             .unwrap();
 
         assert!(cli.delete_task(0).is_ok());
-        assert!(cli.task_mgr.tasks.is_empty());
+        assert!(cli.task_mgr.tasks().is_empty());
     }
 
     #[test]

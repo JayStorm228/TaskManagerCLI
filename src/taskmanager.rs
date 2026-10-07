@@ -3,7 +3,7 @@ use crate::errors::TaskError;
 use super::task::Task;
 
 pub struct TaskManager {
-    pub tasks: Vec<Task>,
+    tasks: Vec<Task>,
     next_id: u32,
 }
 impl TaskManager {
@@ -13,6 +13,9 @@ impl TaskManager {
             next_id: 0,
         }
     }
+    pub fn tasks(&self) -> &Vec<Task> {
+        &self.tasks
+    }
     pub fn add(&mut self, title: String, description: String) -> Result<(), TaskError> {
         let new_task = Task::new(self.next_id, title, Some(description))?;
         self.tasks.push(new_task);
@@ -21,28 +24,24 @@ impl TaskManager {
     }
 
     pub fn delete(&mut self, id: u32) -> Result<(), TaskError> {
-        match self.tasks.iter().position(|t| t.id == id) {
-            Some(id) => {
-                self.tasks.remove(id);
-                Ok(())
-            }
-            None => Err(TaskError::IDNotFound(id)),
+        if !self.tasks.iter().any(|t| t.id == id) {
+            return Err(TaskError::IDNotFound(id));
         }
+        self.tasks.retain(|t| t.id != id);
+        Ok(())
     }
     pub fn complete(&mut self, id: u32) -> Result<(), TaskError> {
-        match self.tasks.iter().position(|t| t.id == id) {
-            Some(id) => {
-                self.tasks[id].mark_done()?;
-                Ok(())
-            }
-            None => Err(TaskError::IDNotFound(id)),
-        }
+        self.tasks
+            .iter_mut()
+            .find(|t| t.id == id)
+            .ok_or(TaskError::IDNotFound(id))?
+            .mark_done()
     }
     pub fn search_id(&self, id: u32) -> Result<&Task, TaskError> {
-        match self.tasks.iter().position(|t| t.id == id) {
-            Some(id) => Ok(&self.tasks[id]),
-            None => Err(TaskError::IDNotFound(id)),
-        }
+        self.tasks
+            .iter()
+            .find(|t| t.id == id)
+            .ok_or(TaskError::IDNotFound(id))
     }
 }
 #[cfg(test)]
