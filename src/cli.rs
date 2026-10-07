@@ -11,6 +11,9 @@ impl Cli {
             task_mgr: TaskManager::new(),
         }
     }
+    pub fn task_mgr(&self) -> &TaskManager {
+        &self.task_mgr
+    }
     pub fn execute(&mut self, command: Command) -> Result<(), TaskError> {
         match command {
             Command::Add { title, description } => {
@@ -22,7 +25,7 @@ impl Cli {
                 Ok(())
             }
             Command::Delete { id } => {
-                self.delete_task(id);
+                self.delete_task(id)?;
                 Ok(())
             }
             Command::Exit => exit(0),
@@ -35,7 +38,7 @@ impl Cli {
                 Ok(())
             }
             Command::Show { id } => {
-                self.show_task(id);
+                self.show_task(id)?;
                 Ok(())
             }
         }
@@ -124,51 +127,5 @@ impl Cli {
             "{:<10} {:<24} {}",
             "help", "—", "Display the list of available commands."
         );
-    }
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn create_cli() -> Cli {
-        Cli {
-            task_mgr: TaskManager::new(),
-        }
-    }
-
-    #[test]
-    fn test_cli_new_task() {
-        let mut cli = create_cli();
-        let res = cli.new_task("Title".to_string(), "Description".to_string());
-        assert!(res.is_ok());
-        assert_eq!(cli.task_mgr.tasks().len(), 1);
-    }
-
-    #[test]
-    fn test_cli_complete_task() {
-        let mut cli = create_cli();
-        cli.new_task("Title".to_string(), "Description".to_string())
-            .unwrap();
-
-        assert!(cli.complete_task(0).is_ok());
-        assert!(cli.task_mgr.tasks()[0].is_completed);
-    }
-
-    #[test]
-    fn test_cli_delete_task() {
-        let mut cli = create_cli();
-        cli.new_task("Title".to_string(), "Description".to_string())
-            .unwrap();
-
-        assert!(cli.delete_task(0).is_ok());
-        assert!(cli.task_mgr.tasks().is_empty());
-    }
-
-    #[test]
-    fn test_cli_not_found_errors() {
-        let mut cli = create_cli();
-        assert_eq!(cli.show_task(42), Err(TaskError::IDNotFound(42)));
-        assert_eq!(cli.complete_task(42), Err(TaskError::IDNotFound(42)));
-        assert_eq!(cli.delete_task(42), Err(TaskError::IDNotFound(42)));
     }
 }

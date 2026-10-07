@@ -1,5 +1,6 @@
 use crate::errors::CommandError;
 use std::io::{self, Write};
+#[derive(Debug, PartialEq)]
 pub enum Command {
     Add { title: String, description: String },
     Show { id: u32 },
@@ -18,7 +19,7 @@ impl Command {
         match command {
             "add" => {
                 let title = parts.next().unwrap_or("");
-                let description = parts.next().unwrap_or("");
+                let description = parts.collect::<Vec<_>>().join(" ");
                 Ok(Self::Add {
                     title: title.to_string(),
                     description: description.to_string(),
@@ -44,7 +45,7 @@ impl Command {
     }
 }
 
-fn parse_id<'a>(parts: &mut std::str::SplitWhitespace<'a>) -> Result<u32, CommandError<'a>> {
+pub fn parse_id<'a>(parts: &mut std::str::SplitWhitespace<'a>) -> Result<u32, CommandError<'a>> {
     let id_raw = parts.next().unwrap_or("");
     match id_raw.trim().parse::<u32>() {
         Ok(value) => Ok(value),

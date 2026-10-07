@@ -32,3 +32,12 @@ fn main() -> io::Result<()> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    pub mod cli_tests;
+    pub mod command_error;
+    pub mod command_parse;
+    pub mod task_error;
+    pub mod taskmanager_tests;
+}
