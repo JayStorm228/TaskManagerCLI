@@ -1,40 +1,61 @@
 {
-  // ---------- Rust ----------
+  // ==================================================
+  // Rust: форматирование
+  // ==================================================
   "[rust]": {
-    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.defaultFormatter": "jinxdash.prettier-rust",
     "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
     "editor.tabSize": 4,
-    "editor.insertSpaces": true
+    "editor.insertSpaces": true,
+    "editor.wordWrap": "off"
   },
 
-  // Clippy вместо обычного cargo check
+  // ==================================================
+  // Rust: анализ кода и диагностика
+  // ==================================================
   "rust-analyzer.check.command": "clippy",
   "rust-analyzer.checkOnSave": true,
 
-  // ---------- TOML ----------
+  // ==================================================
+  // TOML: Cargo.toml и другие конфигурации
+  // ==================================================
   "[toml]": {
     "editor.defaultFormatter": "tamasfe.even-better-toml",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
   },
 
-  // ---------- Проект ----------
-  "files.exclude": {
-    "**/target": true
-  },
-  "search.exclude": {
-    "**/target": true
-  },
-
-  "editor.rulers": [100],
-  "editor.wordWrap": "off",
-  "editor.occurrencesHighlight": "singleFile",
-
-  "errorLens.messageMaxChars": 100,
-
+  // ==================================================
+  // Markdown: документация проекта
+  // ==================================================
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
     "editor.wordWrap": "on",
     "files.trimTrailingWhitespace": false
-  }
+  },
+
+  // ==================================================
+  // Проект: общие параметры редактора
+  // ==================================================
+  "editor.rulers": [100],
+  "editor.occurrencesHighlight": "singleFile",
+
+  // ==================================================
+  // Проект: исключения из проводника и поиска
+  // ==================================================
+  "files.exclude": {
+    "**/target": true
+  },
+
+  "search.exclude": {
+    "**/target": true
+  },
+
+  // ==================================================
+  // Диагностика
+  // ==================================================
+  "errorLens.messageMaxChars": 100
 }
