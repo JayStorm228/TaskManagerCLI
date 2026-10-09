@@ -105,7 +105,7 @@ impl Cli {
         println!(
             "{:<10} {:<24} Add a new task. The description is optional and defaults to an empty string.",
             "add",
-            "<title> [description]"
+            "<title> <priority> [description]"
         );
 
         println!("{:<10} {:<24} Display all tasks with their statuses.", "list", "—");
