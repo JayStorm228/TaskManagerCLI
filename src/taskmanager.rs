@@ -1,6 +1,6 @@
 use crate::errors::TaskError;
 
-use super::task::Task;
+use crate::task::{ Task, TaskPriority };
 
 pub struct TaskManager {
     tasks: Vec<Task>,
@@ -16,8 +16,15 @@ impl TaskManager {
     pub fn tasks(&self) -> &[Task] {
         &self.tasks
     }
-    pub fn add(&mut self, title: String, description: String) -> Result<(), TaskError> {
-        let new_task = Task::new(self.next_id, title, Some(description))?;
+    pub fn add(
+        &mut self,
+        title: String,
+        description: String,
+        priority: String
+    ) -> Result<(), TaskError> {
+        let priority: TaskPriority = priority.parse::<TaskPriority>()?;
+
+        let new_task = Task::new(self.next_id, title, Some(description), priority)?;
         self.tasks.push(new_task);
         self.next_id += 1;
         Ok(())

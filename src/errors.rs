@@ -5,21 +5,24 @@ pub enum TaskError {
     AlreadyCompleted,
     ShortTitle(u32),
     IDNotFound(u32),
+    ParseTaskPriorityError(String),
 }
 
 impl fmt::Display for TaskError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            TaskError::AlreadyCompleted => {
-                write!(formatter, "Task is already completed")
-            }
+            TaskError::AlreadyCompleted => { write!(formatter, "Task is already completed") }
             TaskError::IDNotFound(value) => {
                 write!(formatter, "Cannot find task with this ID: {}", value)
             }
             TaskError::ShortTitle(value) => {
+                write!(formatter, "Title is too short! Must be at least {} characters", value)
+            }
+            TaskError::ParseTaskPriorityError(value) => {
                 write!(
                     formatter,
-                    "Title is too short! Must be at least {} characters",
+                    "Error parsing task priority: {}\n\
+                    Consider uning \"none\" if task has no priority",
                     value
                 )
             }
@@ -38,9 +41,7 @@ impl<'a> fmt::Display for CommandError<'a> {
             CommandError::CommandNotFound(command) => {
                 write!(formatter, "Invalid command: {}", command)
             }
-            CommandError::WrongArgument(arg) => {
-                write!(formatter, "Invalid arguments: {}", arg)
-            }
+            CommandError::WrongArgument(arg) => { write!(formatter, "Invalid arguments: {}", arg) }
         }
     }
 }

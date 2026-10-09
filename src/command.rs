@@ -1,11 +1,21 @@
 use crate::errors::CommandError;
-use std::io::{self, Write};
+use std::io::{ self, Write };
 #[derive(Debug, PartialEq)]
 pub enum Command {
-    Add { title: String, description: String },
-    Show { id: u32 },
-    Delete { id: u32 },
-    Complete { id: u32 },
+    Add {
+        title: String,
+        description: String,
+        priority: String,
+    },
+    Show {
+        id: u32,
+    },
+    Delete {
+        id: u32,
+    },
+    Complete {
+        id: u32,
+    },
     List,
     Help,
     Exit,
@@ -19,10 +29,12 @@ impl Command {
         match command {
             "add" => {
                 let title = parts.next().unwrap_or("");
+                let priority = parts.next().unwrap_or("None");
                 let description = parts.collect::<Vec<_>>().join(" ");
                 Ok(Self::Add {
                     title: title.to_string(),
                     description: description.to_string(),
+                    priority: priority.to_string(),
                 })
             }
             "show" => {
