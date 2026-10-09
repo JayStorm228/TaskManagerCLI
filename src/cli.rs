@@ -162,5 +162,6 @@ impl Cli {
         println!("{:<10} {:<24} Display detailed information about a task.", "show", "<id>");
 
         println!("{:<10} {:<24} Display the list of available commands.", "help", "—");
+        println!("{:<10} {:<24} Exit the program. Drops all stored information", "exit", "—")
     }
 }
