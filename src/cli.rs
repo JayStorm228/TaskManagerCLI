@@ -11,6 +11,7 @@ impl Cli {
             task_mgr: TaskManager::new(),
         }
     }
+    #[cfg(test)]
     pub fn task_mgr(&self) -> &TaskManager {
         &self.task_mgr
     }
