@@ -122,9 +122,9 @@ impl Cli {
         } else {
             for task in self.task_mgr.tasks().iter() {
                 if task.is_completed {
-                    println!("[{}] - {} - \u{2713}", task.id, task.title);
+                    println!("[{}] - {}:{} - \u{2713}", task.id, task.title, task.priority);
                 } else {
-                    println!("[{}] - {} - \u{2717}", task.id, task.title);
+                    println!("[{}] - {}:{} - \u{2717}", task.id, task.title, task.priority);
                 }
             }
             println!("For more information consider using \"taskmanager show <id>\"")
