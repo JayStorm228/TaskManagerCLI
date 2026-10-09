@@ -45,7 +45,8 @@ fn test_cli_execute_show_existing() {
         title: "ShowTask".to_string(),
         description: "Desc".to_string(),
         priority: "None".to_string(),
-    }).unwrap();
+    })
+    .unwrap();
 
     let res = cli.execute(Command::Show { id: 0 });
     assert!(res.is_ok());
@@ -67,7 +68,8 @@ fn test_cli_execute_delete_existing() {
         title: "ToDelete".to_string(),
         description: "Desc".to_string(),
         priority: "None".to_string(),
-    }).unwrap();
+    })
+    .unwrap();
 
     let res = cli.execute(Command::Delete { id: 0 });
     assert!(res.is_ok());
@@ -81,7 +83,8 @@ fn test_cli_execute_delete_not_found() {
         title: "Keep".to_string(),
         description: "Desc".to_string(),
         priority: "None".to_string(),
-    }).unwrap();
+    })
+    .unwrap();
 
     let res = cli.execute(Command::Delete { id: 42 });
     assert_eq!(res, Err(TaskError::IDNotFound(42)));
@@ -96,7 +99,8 @@ fn test_cli_execute_complete_existing() {
         title: "ToComplete".to_string(),
         description: "Desc".to_string(),
         priority: "None".to_string(),
-    }).unwrap();
+    })
+    .unwrap();
 
     let res = cli.execute(Command::Complete { id: 0 });
     assert!(res.is_ok());
@@ -110,7 +114,8 @@ fn test_cli_execute_complete_already_completed() {
         title: "Task".to_string(),
         description: "Desc".to_string(),
         priority: "None".to_string(),
-    }).unwrap();
+    })
+    .unwrap();
     cli.execute(Command::Complete { id: 0 }).unwrap();
 
     let res = cli.execute(Command::Complete { id: 0 });
@@ -124,7 +129,8 @@ fn test_cli_execute_complete_not_found() {
         title: "Task".to_string(),
         description: "Desc".to_string(),
         priority: "None".to_string(),
-    }).unwrap();
+    })
+    .unwrap();
 
     let res = cli.execute(Command::Complete { id: 99 });
     assert_eq!(res, Err(TaskError::IDNotFound(99)));
@@ -146,12 +152,14 @@ fn test_cli_execute_list_with_tasks() {
         title: "Task 1".to_string(),
         description: "Desc".to_string(),
         priority: "None".to_string(),
-    }).unwrap();
+    })
+    .unwrap();
     cli.execute(Command::Add {
         title: "Task 2".to_string(),
         description: "Desc".to_string(),
         priority: "None".to_string(),
-    }).unwrap();
+    })
+    .unwrap();
 
     let res = cli.execute(Command::List);
     assert!(res.is_ok());
@@ -181,12 +189,14 @@ fn test_cli_full_workflow() {
         title: "Task 1".to_string(),
         description: "Desc 1".to_string(),
         priority: "None".to_string(),
-    }).unwrap();
+    })
+    .unwrap();
     cli.execute(Command::Add {
         title: "Task 2".to_string(),
         description: "Desc 2".to_string(),
         priority: "None".to_string(),
-    }).unwrap();
+    })
+    .unwrap();
     assert_eq!(cli.task_mgr().tasks().len(), 2);
 
     // Complete
@@ -209,10 +219,20 @@ fn test_cli_operations_after_delete() {
         title: "Task".to_string(),
         description: "Desc".to_string(),
         priority: "None".to_string(),
-    }).unwrap();
+    })
+    .unwrap();
     cli.execute(Command::Delete { id: 0 }).unwrap();
 
-    assert_eq!(cli.execute(Command::Show { id: 0 }), Err(TaskError::IDNotFound(0)));
-    assert_eq!(cli.execute(Command::Complete { id: 0 }), Err(TaskError::IDNotFound(0)));
-    assert_eq!(cli.execute(Command::Delete { id: 0 }), Err(TaskError::IDNotFound(0)));
+    assert_eq!(
+        cli.execute(Command::Show { id: 0 }),
+        Err(TaskError::IDNotFound(0))
+    );
+    assert_eq!(
+        cli.execute(Command::Complete { id: 0 }),
+        Err(TaskError::IDNotFound(0))
+    );
+    assert_eq!(
+        cli.execute(Command::Delete { id: 0 }),
+        Err(TaskError::IDNotFound(0))
+    );
 }

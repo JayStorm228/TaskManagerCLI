@@ -51,7 +51,10 @@ fn test_parse_priority_invalid_value() {
 
 #[test]
 fn test_parse_priority_empty_string() {
-    assert_eq!(TaskPriority::from_str(""), Err(TaskError::ParseTaskPriorityError(String::new())));
+    assert_eq!(
+        TaskPriority::from_str(""),
+        Err(TaskError::ParseTaskPriorityError(String::new()))
+    );
 }
 
 // ===== TaskManager::add with priority =====
@@ -63,7 +66,7 @@ fn test_add_task_with_low_priority() {
     let result = manager.add(
         "Low priority task".to_string(),
         "Description".to_string(),
-        "low".to_string()
+        "low".to_string(),
     );
 
     assert!(result.is_ok());
@@ -76,7 +79,11 @@ fn test_add_task_with_medium_priority() {
     let mut manager = TaskManager::new();
 
     manager
-        .add("Medium priority task".to_string(), "Description".to_string(), "medium".to_string())
+        .add(
+            "Medium priority task".to_string(),
+            "Description".to_string(),
+            "medium".to_string(),
+        )
         .unwrap();
 
     assert_eq!(manager.tasks()[0].priority, TaskPriority::Medium);
@@ -87,7 +94,11 @@ fn test_add_task_with_high_priority() {
     let mut manager = TaskManager::new();
 
     manager
-        .add("High priority task".to_string(), "Description".to_string(), "high".to_string())
+        .add(
+            "High priority task".to_string(),
+            "Description".to_string(),
+            "high".to_string(),
+        )
         .unwrap();
 
     assert_eq!(manager.tasks()[0].priority, TaskPriority::High);
@@ -98,7 +109,11 @@ fn test_add_task_with_none_priority() {
     let mut manager = TaskManager::new();
 
     manager
-        .add("Task without priority".to_string(), "Description".to_string(), "none".to_string())
+        .add(
+            "Task without priority".to_string(),
+            "Description".to_string(),
+            "none".to_string(),
+        )
         .unwrap();
 
     assert_eq!(manager.tasks()[0].priority, TaskPriority::None);
@@ -111,10 +126,13 @@ fn test_add_task_with_invalid_priority_fails() {
     let result = manager.add(
         "Invalid priority task".to_string(),
         "Description".to_string(),
-        "urgent".to_string()
+        "urgent".to_string(),
     );
 
-    assert_eq!(result, Err(TaskError::ParseTaskPriorityError("urgent".to_string())));
+    assert_eq!(
+        result,
+        Err(TaskError::ParseTaskPriorityError("urgent".to_string()))
+    );
 
     assert!(manager.tasks().is_empty());
 }
@@ -126,13 +144,17 @@ fn test_invalid_priority_does_not_consume_task_id() {
     let result = manager.add(
         "Invalid priority task".to_string(),
         "Description".to_string(),
-        "urgent".to_string()
+        "urgent".to_string(),
     );
 
     assert!(result.is_err());
 
     manager
-        .add("Valid priority task".to_string(), "Description".to_string(), "high".to_string())
+        .add(
+            "Valid priority task".to_string(),
+            "Description".to_string(),
+            "high".to_string(),
+        )
         .unwrap();
 
     assert_eq!(manager.tasks().len(), 1);
@@ -144,15 +166,27 @@ fn test_multiple_tasks_keep_individual_priorities() {
     let mut manager = TaskManager::new();
 
     manager
-        .add("First task".to_string(), "First description".to_string(), "low".to_string())
+        .add(
+            "First task".to_string(),
+            "First description".to_string(),
+            "low".to_string(),
+        )
         .unwrap();
 
     manager
-        .add("Second task".to_string(), "Second description".to_string(), "high".to_string())
+        .add(
+            "Second task".to_string(),
+            "Second description".to_string(),
+            "high".to_string(),
+        )
         .unwrap();
 
     manager
-        .add("Third task".to_string(), "Third description".to_string(), "none".to_string())
+        .add(
+            "Third task".to_string(),
+            "Third description".to_string(),
+            "none".to_string(),
+        )
         .unwrap();
 
     assert_eq!(manager.tasks().len(), 3);
@@ -168,42 +202,54 @@ fn test_multiple_tasks_keep_individual_priorities() {
 fn test_parse_add_command_with_priority() {
     let command = Command::parse("add Report high").unwrap();
 
-    assert_eq!(command, Command::Add {
-        title: "Report".to_string(),
-        description: String::new(),
-        priority: "high".to_string(),
-    });
+    assert_eq!(
+        command,
+        Command::Add {
+            title: "Report".to_string(),
+            description: String::new(),
+            priority: "high".to_string(),
+        }
+    );
 }
 
 #[test]
 fn test_parse_add_command_with_priority_and_description() {
     let command = Command::parse("add Report high Finish the weekly report").unwrap();
 
-    assert_eq!(command, Command::Add {
-        title: "Report".to_string(),
-        description: "Finish the weekly report".to_string(),
-        priority: "high".to_string(),
-    });
+    assert_eq!(
+        command,
+        Command::Add {
+            title: "Report".to_string(),
+            description: "Finish the weekly report".to_string(),
+            priority: "high".to_string(),
+        }
+    );
 }
 
 #[test]
 fn test_parse_add_command_without_priority_uses_none() {
     let command = Command::parse("add Report").unwrap();
 
-    assert_eq!(command, Command::Add {
-        title: "Report".to_string(),
-        description: String::new(),
-        priority: "None".to_string(),
-    });
+    assert_eq!(
+        command,
+        Command::Add {
+            title: "Report".to_string(),
+            description: String::new(),
+            priority: "None".to_string(),
+        }
+    );
 }
 
 #[test]
 fn test_parse_add_command_preserves_priority_for_validation() {
     let command = Command::parse("add Report urgent").unwrap();
 
-    assert_eq!(command, Command::Add {
-        title: "Report".to_string(),
-        description: String::new(),
-        priority: "urgent".to_string(),
-    });
+    assert_eq!(
+        command,
+        Command::Add {
+            title: "Report".to_string(),
+            description: String::new(),
+            priority: "urgent".to_string(),
+        }
+    );
 }

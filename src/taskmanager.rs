@@ -1,6 +1,6 @@
 use crate::errors::TaskError;
 
-use crate::task::{ Task, TaskPriority };
+use crate::task::{Task, TaskPriority};
 
 /// Manages the collection of tasks.
 ///
@@ -61,7 +61,7 @@ impl TaskManager {
         &mut self,
         title: String,
         description: String,
-        priority: String
+        priority: String,
     ) -> Result<(), TaskError> {
         let priority: TaskPriority = priority.parse::<TaskPriority>()?;
 

@@ -1,4 +1,4 @@
-use std::{ fmt::Display, str::FromStr };
+use std::{fmt::Display, str::FromStr};
 
 use super::errors::TaskError;
 
@@ -139,7 +139,7 @@ impl Task {
         id: u32,
         title: String,
         description: Option<String>,
-        priority: TaskPriority
+        priority: TaskPriority,
     ) -> Result<Self, TaskError> {
         if title.chars().count() < (SHORT_TITLE_LEN as usize) {
             Err(TaskError::ShortTitle(SHORT_TITLE_LEN))

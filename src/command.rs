@@ -1,5 +1,5 @@
 use crate::errors::CommandError;
-use std::io::{ self, Write };
+use std::io::{self, Write};
 
 /// Represents a command that can be executed by the application.
 ///
