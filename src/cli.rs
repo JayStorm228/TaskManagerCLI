@@ -87,45 +87,40 @@ impl Cli {
     }
     fn complete_task(&mut self, id: u32) -> Result<(), TaskError> {
         let task = self.task_mgr.search_id(id)?;
-        println!("Task Comlpete:\n{}--{}", task.id, task.title);
+        println!("Task Complete:\n{}--{}", task.id, task.title);
         self.task_mgr.complete(id)?;
         Ok(())
     }
     fn help() {
-        println!("{:<10} {:<24} {}", "Command", "Arguments", "Description");
+        println!("{:<10} {:<24} Description", "Command", "Arguments",);
 
         println!("{}", "-".repeat(80));
 
         println!(
-            "{:<10} {:<24} {}",
-            "add",
-            "<title> [description]",
-            "Add a new task. The description is optional and defaults to an empty string."
+            "{:<10} {:<24} Add a new task. The description is optional and defaults to an empty string.",
+            "add", "<title> [description]",
         );
 
         println!(
-            "{:<10} {:<24} {}",
-            "list", "—", "Display all tasks with their statuses."
+            "{:<10} {:<24} Display all tasks with their statuses.",
+            "list", "—",
         );
 
         println!(
-            "{:<10} {:<24} {}",
-            "complete", "<id>", "Mark a task as completed by its ID."
+            "{:<10} {:<24} Mark a task as completed by its ID.",
+            "complete", "<id>",
+        );
+
+        println!("{:<10} {:<24} Delete a task by its ID", "delete", "<id>",);
+
+        println!(
+            "{:<10} {:<24} Display detailed information about a task.",
+            "show", "<id>",
         );
 
         println!(
-            "{:<10} {:<24} {}",
-            "delete", "<id>", "Delete a task by its ID."
-        );
-
-        println!(
-            "{:<10} {:<24} {}",
-            "show", "<id>", "Display detailed information about a task."
-        );
-
-        println!(
-            "{:<10} {:<24} {}",
-            "help", "—", "Display the list of available commands."
+            "{:<10} {:<24} Display the list of available commands.",
+            "help", "—",
         );
     }
 }
