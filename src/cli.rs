@@ -1,6 +1,6 @@
 use std::process::exit;
 
-use crate::{command::Command, errors::TaskError, taskmanager::TaskManager};
+use crate::{ command::Command, errors::TaskError, taskmanager::TaskManager };
 
 /// Provides the command-line interface for the task manager.
 ///
@@ -61,11 +61,7 @@ impl Cli {
     /// the process instead of returning.
     pub fn execute(&mut self, command: Command) -> Result<(), TaskError> {
         match command {
-            Command::Add {
-                title,
-                description,
-                priority,
-            } => {
+            Command::Add { title, description, priority } => {
                 self.new_task(title, description, priority)?;
                 Ok(())
             }
@@ -96,7 +92,7 @@ impl Cli {
         &mut self,
         title: String,
         description: String,
-        priority: String,
+        priority: String
     ) -> Result<(), TaskError> {
         println!("Trying to add task");
         println!("Title: {title}, description:\n{description}");
@@ -126,15 +122,9 @@ impl Cli {
         } else {
             for task in self.task_mgr.tasks().iter() {
                 if task.is_completed {
-                    println!(
-                        "[{}] - {}:{} - \u{2713}",
-                        task.id, task.title, task.priority
-                    );
+                    println!("[{}] - {}:{} - \u{2713}", task.id, task.title, task.priority);
                 } else {
-                    println!(
-                        "[{}] - {}:{} - \u{2717}",
-                        task.id, task.title, task.priority
-                    );
+                    println!("[{}] - {}:{} - \u{2717}", task.id, task.title, task.priority);
                 }
             }
             println!("For more information consider using \"taskmanager show <id>\"")
@@ -158,34 +148,20 @@ impl Cli {
         println!("{}", "-".repeat(80));
 
         println!(
-            "{:<10} {:<24} Add a new task. The description is optional and defaults to .",
-            "add", "<title> <priority> [description]"
+            "{:<10} {:<24} Add a new task. The description is optional and defaults to \"Undefined\".",
+            "add",
+            "<title> <priority> [description]"
         );
 
-        println!(
-            "{:<10} {:<24} Display all tasks with their statuses.",
-            "list", "—"
-        );
+        println!("{:<10} {:<24} Display all tasks with their statuses.", "list", "—");
 
-        println!(
-            "{:<10} {:<24} Mark a task as completed by its ID.",
-            "complete", "<id>"
-        );
+        println!("{:<10} {:<24} Mark a task as completed by its ID.", "complete", "<id>");
 
         println!("{:<10} {:<24} Delete a task by its ID", "delete", "<id>");
 
-        println!(
-            "{:<10} {:<24} Display detailed information about a task.",
-            "show", "<id>"
-        );
+        println!("{:<10} {:<24} Display detailed information about a task.", "show", "<id>");
 
-        println!(
-            "{:<10} {:<24} Display the list of available commands.",
-            "help", "—"
-        );
-        println!(
-            "{:<10} {:<24} Exit the program. Drops all stored information",
-            "exit", "—"
-        )
+        println!("{:<10} {:<24} Display the list of available commands.", "help", "—");
+        println!("{:<10} {:<24} Exit the program. Drops all stored information", "exit", "—")
     }
 }

@@ -121,8 +121,8 @@ Each task can have one of four priority values:
 | `none`   | No assigned priority |
 
 Priority names are case-insensitive. For example, `high`, `HIGH`, and `High` are accepted.
-
-If the priority argument is omitted, the parser defaults to `none`.
+Priority value must be include, if task has description.
+If the priority argument and description is omitted, the parser defaults to `none`.
 
 ## Validation and errors
 

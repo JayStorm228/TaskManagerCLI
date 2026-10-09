@@ -1,4 +1,4 @@
-use std::{fmt::Display, str::FromStr};
+use std::{ fmt::Display, str::FromStr };
 
 use super::errors::TaskError;
 
@@ -117,7 +117,7 @@ impl Task {
     /// The task is initialized with the provided identifier, title, description,
     /// and priority. Its completion status is set to `false`.
     ///
-    /// If the description is `None`, it defaults to `"Не задано"`.
+    /// If the description is `None`, it defaults to `"Undefined"`.
     /// The title must contain at least three Unicode characters.
     ///
     /// # Arguments
@@ -139,7 +139,7 @@ impl Task {
         id: u32,
         title: String,
         description: Option<String>,
-        priority: TaskPriority,
+        priority: TaskPriority
     ) -> Result<Self, TaskError> {
         if title.chars().count() < (SHORT_TITLE_LEN as usize) {
             Err(TaskError::ShortTitle(SHORT_TITLE_LEN))
