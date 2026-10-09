@@ -61,6 +61,7 @@ impl Cli {
     fn show_task(&self, id: u32) -> Result<(), TaskError> {
         let task = self.task_mgr.search_id(id)?;
         println!("\n====== Task {}:{} ======", task.id, task.title);
+        println!("Priority: {}", task.priority);
         println!("{}", task.description);
         println!("--------------------------");
         if task.is_completed {
@@ -103,7 +104,7 @@ impl Cli {
         println!("{}", "-".repeat(80));
 
         println!(
-            "{:<10} {:<24} Add a new task. The description is optional and defaults to an empty string.",
+            "{:<10} {:<24} Add a new task. The description is optional and defaults to .",
             "add",
             "<title> <priority> [description]"
         );
