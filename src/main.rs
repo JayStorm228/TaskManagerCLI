@@ -40,4 +40,5 @@ mod tests {
     pub mod command_parse;
     pub mod task_error;
     pub mod taskmanager_tests;
+    pub mod test_priority;
 }

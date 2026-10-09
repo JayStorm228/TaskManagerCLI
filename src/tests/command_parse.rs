@@ -1,45 +1,39 @@
-use crate::command::{Command, parse_id};
+use crate::command::{ Command, parse_id };
 use crate::errors::CommandError;
 
 // ===== Command::parse =====
 
 #[test]
 fn test_parse_add_command() {
-    let input = "add Buy milk from store";
+    let input = "add  Buy None milk from store";
     let cmd = Command::parse(input).unwrap();
-    assert_eq!(
-        cmd,
-        Command::Add {
-            title: "Buy".to_string(),
-            description: "milk from store".to_string(),
-        }
-    );
+    assert_eq!(cmd, Command::Add {
+        title: "Buy".to_string(),
+        description: "milk from store".to_string(),
+        priority: "None".to_string(),
+    });
 }
 
 #[test]
 fn test_parse_add_single_word_title() {
     let input = "add Test";
     let cmd = Command::parse(input).unwrap();
-    assert_eq!(
-        cmd,
-        Command::Add {
-            title: "Test".to_string(),
-            description: "".to_string(),
-        }
-    );
+    assert_eq!(cmd, Command::Add {
+        title: "Test".to_string(),
+        description: "".to_string(),
+        priority: "None".to_string(),
+    });
 }
 
 #[test]
 fn test_parse_add_no_description() {
     let input = "add Task";
     let cmd = Command::parse(input).unwrap();
-    assert_eq!(
-        cmd,
-        Command::Add {
-            title: "Task".to_string(),
-            description: "".to_string(),
-        }
-    );
+    assert_eq!(cmd, Command::Add {
+        title: "Task".to_string(),
+        description: "".to_string(),
+        priority: "None".to_string(),
+    });
 }
 
 #[test]
