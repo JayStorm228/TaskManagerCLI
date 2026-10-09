@@ -4,7 +4,8 @@
     "tamasfe.even-better-toml",
     "fill-labs.dependi",
     "vadimcn.vscode-lldb",
-    "usernamehw.errorlens"
+    "usernamehw.errorlens",
+    "jinxdash.prettier-rust"
   ],
   "unwantedRecommendations": ["serayuzgur.crates"]
 }

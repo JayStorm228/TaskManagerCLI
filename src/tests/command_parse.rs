@@ -5,13 +5,14 @@ use crate::errors::CommandError;
 
 #[test]
 fn test_parse_add_command() {
-    let input = "add Buy milk from store";
+    let input = "add  Buy None milk from store";
     let cmd = Command::parse(input).unwrap();
     assert_eq!(
         cmd,
         Command::Add {
             title: "Buy".to_string(),
             description: "milk from store".to_string(),
+            priority: "None".to_string(),
         }
     );
 }
@@ -25,6 +26,7 @@ fn test_parse_add_single_word_title() {
         Command::Add {
             title: "Test".to_string(),
             description: "".to_string(),
+            priority: "None".to_string(),
         }
     );
 }
@@ -38,6 +40,7 @@ fn test_parse_add_no_description() {
         Command::Add {
             title: "Task".to_string(),
             description: "".to_string(),
+            priority: "None".to_string(),
         }
     );
 }

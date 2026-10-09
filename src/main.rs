@@ -1,3 +1,12 @@
+//! A command-line task manager.
+//!
+//! The application allows users to create, list, inspect, complete,
+//! and delete tasks. Tasks can also be assigned priorities.
+//!
+//! Commands are entered interactively through standard input.
+
+#![warn(missing_docs)]
+
 mod cli;
 mod command;
 mod errors;
@@ -40,4 +49,5 @@ mod tests {
     pub mod command_parse;
     pub mod task_error;
     pub mod taskmanager_tests;
+    pub mod test_priority;
 }
