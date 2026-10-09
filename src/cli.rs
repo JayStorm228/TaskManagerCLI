@@ -2,19 +2,63 @@ use std::process::exit;
 
 use crate::{ command::Command, errors::TaskError, taskmanager::TaskManager };
 
+/// Provides the command-line interface for the task manager.
+///
+/// The CLI receives parsed commands, delegates task operations to
+/// [`TaskManager`], and displays results and task information to the user.
 pub struct Cli {
     task_mgr: TaskManager,
 }
 impl Cli {
+    /// Creates a new command-line interface.
+    ///
+    /// The interface is initialized with an empty [`TaskManager`].
+    ///
+    /// # Returns
+    ///
+    /// Returns a new [`Cli`] instance.
     pub fn new() -> Self {
         Self {
             task_mgr: TaskManager::new(),
         }
     }
+
+    /// Returns an immutable reference to the underlying task manager.
+    ///
+    /// This method is available only in test builds and allows tests to inspect
+    /// the current task state without modifying it.
+    ///
+    /// # Returns
+    ///
+    /// An immutable reference to the [`TaskManager`].
     #[cfg(test)]
     pub fn task_mgr(&self) -> &TaskManager {
         &self.task_mgr
     }
+
+    /// Executes a parsed command.
+    ///
+    /// Dispatches the supplied command to the corresponding operation.
+    /// Commands that operate on tasks may print information or report errors.
+    /// The `Exit` command terminates the process.
+    ///
+    /// # Arguments
+    ///
+    /// * `command` - The command to execute.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if the operation completes successfully.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`TaskError`] if a task operation fails, for example because
+    /// the requested task does not exist or has already been completed.
+    ///
+    /// # Panics
+    ///
+    /// This method does not explicitly panic, but the `Exit` command terminates
+    /// the process instead of returning.
     pub fn execute(&mut self, command: Command) -> Result<(), TaskError> {
         match command {
             Command::Add { title, description, priority } => {
