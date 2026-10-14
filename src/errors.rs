@@ -38,7 +38,7 @@ impl fmt::Display for TaskError {
                 write!(
                     formatter,
                     "Error parsing task priority: {}\n\
-                    Consider uning \"none\" if task has no priority",
+                    Consider using \"none\" if task has no priority",
                     value
                 )
             }
@@ -47,36 +47,67 @@ impl fmt::Display for TaskError {
 }
 impl std::error::Error for TaskError {}
 
-/// Represents errors encountered while parsing a command.
-///
-/// The error retains a reference to the input token that caused the failure,
-/// rather than allocating a new string.
-///
-/// # Lifetime
-///
-/// The lifetime `'a` is tied to the input string from which the token
-/// was obtained.
-#[derive(Debug, PartialEq)]
-pub enum CommandError<'a> {
-    /// The supplied command name is not recognized.
-    ///
-    /// The contained string slice refers to the unrecognized command token.
-    CommandNotFound(&'a str),
+#[derive(Debug, PartialEq, Eq)]
+pub enum CmdLineError {
+    /// Во входной строке открыта кавычка, но она не была закрыта.
+    UnterminatedQuote(String),
 
-    /// A command argument is missing or has an invalid format.
-    ///
-    /// The contained string slice refers to the argument that could not
-    /// be parsed.
-    WrongArgument(&'a str),
+    /// Сразу после закрывающей кавычки найден символ, отличный от пробельного.
+    UnexpectedCharAfterQuote(char),
+
+    /// Командная строка не содержит ни одного токена.
+    EmptyCommandLine,
+
+    /// Аргумент объявлен как `--name`, но для него не указано значение.
+    MissingArgumentValue(String),
+
+    /// Один и тот же аргумент `--name` встречается более одного раза.
+    DuplicateArgument(String),
+
+    /// После команды найден токен, который не начинается с `--`.
+    InvalidArgument(String),
 }
-impl<'a> fmt::Display for CommandError<'a> {
-    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+
+impl fmt::Display for CmdLineError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            CommandError::CommandNotFound(command) => {
-                write!(formatter, "Invalid command: {}", command)
+            Self::UnterminatedQuote(input) => {
+                write!(f, "Unterminated quote in command line:\n{input}")
             }
-            CommandError::WrongArgument(arg) => { write!(formatter, "Invalid arguments: {}", arg) }
+            Self::UnexpectedCharAfterQuote(ch) =>
+                write!(f, "After a closing quote, whitespace was expected, but found: '{ch}'"),
+            Self::EmptyCommandLine =>
+                write!(
+                    f,
+                    "Empty command line. Consider calling `CmdLine::input()` before parsing."
+                ),
+            Self::MissingArgumentValue(argument) => {
+                write!(f, "Missing value for argument: '{argument}'")
+            }
+            Self::DuplicateArgument(argument) => { write!(f, "Duplicate argument: '{argument}'") }
+            Self::InvalidArgument(token) =>
+                write!(f, "Invalid argument: '{token}'. Arguments must start with '--'."),
         }
     }
 }
-impl<'a> std::error::Error for CommandError<'a> {}
+
+impl std::error::Error for CmdLineError {}
+
+pub enum CommandError {
+    CommandNotFound(String),
+    ArgumentNotFound(String),
+    InvalidArgument(String),
+}
+impl fmt::Display for CommandError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::CommandNotFound(cmd) => {
+                write!(f, "Invalid command: {}.\nTry typing \"help\" for available commands", cmd)
+            }
+            Self::ArgumentNotFound(arg) => {
+                write!(f, "Could not find required argument: {}", arg)
+            }
+            Self::InvalidArgument(msg) => { write!(f, "{}", msg) }
+        }
+    }
+}

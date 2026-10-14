@@ -1,5 +1,4 @@
-use crate::errors::CommandError;
-use std::io::{self, Write};
+use crate::{ command_line::CmdLine, errors::CommandError };
 
 /// Represents a command that can be executed by the application.
 ///
@@ -74,85 +73,79 @@ impl Command {
     /// Returns [`CommandError::CommandNotFound`] if the command name is unknown,
     /// or [`CommandError::WrongArgument`] if a required numeric identifier
     /// cannot be parsed as a `u32`.
-    pub fn parse<'a>(input: &'a str) -> Result<Self, CommandError<'a>> {
-        let mut parts = input.split_whitespace();
-        let command = parts.next().unwrap_or("");
+    pub fn parse(cmdline: CmdLine) -> Result<Self, CommandError> {
+        let args = cmdline.get_args();
+        let cmd = match args.get("command") {
+            Some(cmd) => cmd.clone(),
+            None => "".to_string(),
+        };
 
-        match command {
+        match cmd.as_str() {
             "add" => {
-                let title = parts.next().unwrap_or("");
-                let priority = parts.next().unwrap_or("None");
-                let description = parts.collect::<Vec<_>>().join(" ");
-                Ok(Self::Add {
-                    title: title.to_string(),
-                    description: description.to_string(),
-                    priority: priority.to_string(),
-                })
+                let title = match args.get("--title") {
+                    Some(title) => title.clone(),
+                    None => {
+                        return Err(CommandError::ArgumentNotFound("--title".to_string()));
+                    }
+                };
+                let description = match args.get("--description") {
+                    Some(desc) => desc.clone(),
+                    None => "".to_string(),
+                };
+                let priority = match args.get("--priority") {
+                    Some(p) => { p.clone() }
+                    None => "none".to_string(),
+                };
+                Ok(Command::Add { title, description, priority })
             }
             "show" => {
-                let id = parse_id(&mut parts)?;
-                Ok(Self::Show { id })
+                let id = match args.get("--id") {
+                    Some(id) => id.clone(),
+                    None => {
+                        return Err(CommandError::ArgumentNotFound("--id".to_string()));
+                    }
+                };
+                let id = parse_id(id)?;
+                Ok(Command::Show { id })
             }
             "delete" => {
-                let id = parse_id(&mut parts)?;
-                Ok(Self::Delete { id })
+                let id = match args.get("--id") {
+                    Some(id) => id.clone(),
+                    None => {
+                        return Err(CommandError::ArgumentNotFound("--id".to_string()));
+                    }
+                };
+                let id = parse_id(id)?;
+                Ok(Command::Delete { id })
             }
             "complete" => {
-                let id = parse_id(&mut parts)?;
-                Ok(Self::Complete { id })
+                let id = match args.get("--id") {
+                    Some(id) => id.clone(),
+                    None => {
+                        return Err(CommandError::ArgumentNotFound("--id".to_string()));
+                    }
+                };
+                let id = parse_id(id)?;
+                Ok(Command::Complete { id })
             }
             "list" => Ok(Self::List),
             "help" => Ok(Self::Help),
             "exit" => Ok(Self::Exit),
-            _ => Err(CommandError::CommandNotFound(command)),
+            _ => Err(CommandError::CommandNotFound(cmd.to_string())),
         }
     }
 }
 
-/// Parses a task identifier from a sequence of whitespace-separated tokens.
-///
-/// The function reads the next token and attempts to parse it as a `u32`.
-///
-/// # Arguments
-///
-/// * `parts` - A mutable iterator over the remaining command tokens.
-///
-/// # Returns
-///
-/// Returns the parsed identifier on success.
-///
-/// # Errors
-///
-/// Returns [`CommandError::WrongArgument`] if no token is available
-/// or the token cannot be parsed as a `u32`.
-pub fn parse_id<'a>(parts: &mut std::str::SplitWhitespace<'a>) -> Result<u32, CommandError<'a>> {
-    let id_raw = parts.next().unwrap_or("");
-    match id_raw.trim().parse::<u32>() {
-        Ok(value) => Ok(value),
-        Err(_) => Err(CommandError::WrongArgument(id_raw)),
-    }
-}
-
-/// Reads a line of user input from standard input.
-///
-/// Prints the `>` prompt, flushes standard output, and reads one line
-/// from standard input.
-///
-/// # Returns
-///
-/// Returns the input line as a [`String`], including its trailing newline
-/// if one was read.
-///
-/// # Errors
-///
-/// Returns an [`io::Error`] if flushing standard output or reading from
-/// standard input fails.
-pub fn parse_input() -> Result<String, io::Error> {
-    print!("> ");
-    io::stdout().flush()?;
-
-    let mut command_line = String::new();
-    io::stdin().read_line(&mut command_line)?;
-
-    Ok(command_line)
+fn parse_id(id: String) -> Result<u32, CommandError> {
+    let id = match id.trim().parse::<u32>() {
+        Ok(val) => val,
+        Err(_) => {
+            return Err(
+                CommandError::InvalidArgument(
+                    format!("Could not parse given ID.\nID must be an unsigned int:{}", id)
+                )
+            );
+        }
+    };
+    Ok(id)
 }

@@ -8,34 +8,34 @@
 #![warn(missing_docs)]
 
 mod cli;
-mod command;
 mod errors;
 mod task;
 mod taskmanager;
+mod command;
 use std::io;
-
-use crate::command::Command;
+mod command_line;
 
 fn main() -> io::Result<()> {
     let mut interface = cli::Cli::new();
     loop {
-        let input = match command::parse_input() {
-            Ok(value) => value,
+        let mut cmdline = command_line::CmdLine::new();
+        if let Err(e) = cmdline.input() {
+            eprintln!("{e}");
+            continue;
+        }
+        if let Err(e) = cmdline.parse() {
+            eprintln!("{e}");
+            continue;
+        }
+        let cmd = match command::Command::parse(cmdline) {
+            Ok(cmd) => cmd,
             Err(e) => {
                 eprintln!("{e}");
                 continue;
             }
         };
 
-        let command = match Command::parse(&input) {
-            Ok(value) => value,
-            Err(e) => {
-                eprintln!("{e}");
-                continue;
-            }
-        };
-
-        if let Err(e) = interface.execute(command) {
+        if let Err(e) = interface.execute(cmd) {
             eprintln!("{e}");
             continue;
         }

@@ -95,7 +95,7 @@ impl Cli {
         priority: String
     ) -> Result<(), TaskError> {
         println!("Trying to add task");
-        println!("Title: {title}, description:\n{description}");
+        println!("Title: {title}, priority:{priority} description:\n{description}");
 
         self.task_mgr.add(title, description, priority)?;
 
