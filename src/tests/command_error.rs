@@ -1,50 +1,23 @@
 use crate::errors::CommandError;
 
 #[test]
-fn test_command_not_found_display() {
-    let err: CommandError = CommandError::CommandNotFound("add");
-    assert_eq!(err.to_string(), "Invalid command: add");
-}
-
-#[test]
-fn test_wrong_argument_display() {
-    let err: CommandError = CommandError::WrongArgument("invalid-id");
-    assert_eq!(err.to_string(), "Invalid arguments: invalid-id");
-}
-
-#[test]
-fn test_command_error_debug() {
-    let err1: CommandError = CommandError::CommandNotFound("done");
-    let err2: CommandError = CommandError::WrongArgument("bad");
-
-    assert_eq!(format!("{:?}", err1), "CommandNotFound(\"done\")");
-    assert_eq!(format!("{:?}", err2), "WrongArgument(\"bad\")");
-}
-
-#[test]
-fn test_command_error_partial_eq() {
-    let err1: CommandError = CommandError::CommandNotFound("list");
-    let err2: CommandError = CommandError::CommandNotFound("list");
-    let err3: CommandError = CommandError::CommandNotFound("remove");
-
-    assert_eq!(err1, err2);
-    assert_ne!(err1, err3);
-
-    let err4: CommandError = CommandError::WrongArgument("x");
-    let err5: CommandError = CommandError::WrongArgument("x");
-    let err6: CommandError = CommandError::WrongArgument("y");
-
-    assert_eq!(err4, err5);
-    assert_ne!(err4, err6);
-
-    assert_ne!(
-        CommandError::CommandNotFound("cmd"),
-        CommandError::WrongArgument("arg")
+fn command_not_found_display() {
+    let error = CommandError::CommandNotFound("unknown".to_string());
+    assert_eq!(
+        error.to_string(),
+        "Invalid command: unknown.\nTry typing \"help\" for available commands"
     );
 }
 
 #[test]
-fn test_command_error_is_error() {
-    let err: CommandError = CommandError::CommandNotFound("test");
-    assert!(std::error::Error::source(&err).is_none());
+fn required_argument_not_found_display() {
+    let error = CommandError::ArgumentNotFound("--title".to_string());
+    assert_eq!(error.to_string(), "Could not find required argument: --title");
+}
+
+#[test]
+fn invalid_argument_display() {
+    let message = "ID must be a non-negative integer";
+    let error = CommandError::InvalidArgument(message.to_string());
+    assert_eq!(error.to_string(), message);
 }

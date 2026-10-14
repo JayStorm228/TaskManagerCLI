@@ -93,6 +93,7 @@ impl fmt::Display for CmdLineError {
 
 impl std::error::Error for CmdLineError {}
 
+#[derive(Debug, PartialEq, Eq)]
 pub enum CommandError {
     CommandNotFound(String),
     ArgumentNotFound(String),
