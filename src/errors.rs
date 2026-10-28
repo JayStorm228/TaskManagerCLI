@@ -49,23 +49,26 @@ impl std::error::Error for TaskError {}
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum CmdLineError {
-    /// Во входной строке открыта кавычка, но она не была закрыта.
+    /// An opening quote has no matching closing quote
     UnterminatedQuote(String),
 
-    /// Сразу после закрывающей кавычки найден символ, отличный от пробельного.
+    /// A non-whitespace character immediately follows a closing quote
     UnexpectedCharAfterQuote(char),
 
-    /// Командная строка не содержит ни одного токена.
+    /// Command line contains no tokens
     EmptyCommandLine,
 
-    /// Аргумент объявлен как `--name`, но для него не указано значение.
+    /// An argument specified as `--name` has no value
     MissingArgumentValue(String),
 
-    /// Один и тот же аргумент `--name` встречается более одного раза.
+    /// The same argument (`--name`) specified more than once
     DuplicateArgument(String),
 
-    /// После команды найден токен, который не начинается с `--`.
+    /// An unexpected token follows the command and doesn't start with `--`
     InvalidArgument(String),
+
+    /// a trailing backslash has no character to escape
+    UnterminatedEscapeSequence(String),
 }
 
 impl fmt::Display for CmdLineError {
@@ -82,11 +85,14 @@ impl fmt::Display for CmdLineError {
                     "Empty command line. Consider calling `CmdLine::input()` before parsing."
                 ),
             Self::MissingArgumentValue(argument) => {
-                write!(f, "Missing value for argument: '{argument}'")
+                write!(f, "Missing value for argument: \'{argument}\'")
             }
             Self::DuplicateArgument(argument) => { write!(f, "Duplicate argument: '{argument}'") }
             Self::InvalidArgument(token) =>
-                write!(f, "Invalid argument: '{token}'. Arguments must start with '--'."),
+                write!(f, "Invalid argument: \'{token}\'. Arguments must start with \'--\'."),
+            Self::UnterminatedEscapeSequence(input) => {
+                write!(f, "Unterminated escape sequence found in command line:\n{input}")
+            }
         }
     }
 }
@@ -95,8 +101,13 @@ impl std::error::Error for CmdLineError {}
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum CommandError {
+    /// Entered command is not supported
     CommandNotFound(String),
+
+    /// No required arguments is provided
     ArgumentNotFound(String),
+
+    /// Provided argument is invalid type, or cannot be used by corresponding command
     InvalidArgument(String),
 }
 impl fmt::Display for CommandError {

@@ -48,31 +48,21 @@ pub enum Command {
 }
 
 impl Command {
-    /// Parses a command from a string.
+    /// Parses a command from the provided [`CmdLine`].
     ///
-    /// The input is split into whitespace-separated tokens. The first token
-    /// determines the command, and the remaining tokens are interpreted
-    /// according to that command's expected arguments.
+    /// Converts the command name and its arguments into a corresponding
+    /// [`Command`] variant.
     ///
-    /// For the `add` command, the title is taken from the first argument,
-    /// the priority from the second argument, and all remaining tokens are
-    /// joined into the description. If the priority is omitted and only the title is, it defaults
-    /// to `"None"`.
-    ///
-    /// # Arguments
-    ///
-    /// * `input` - The input string to parse.
-    ///
-    /// # Returns
-    ///
-    /// Returns the corresponding [`Command`] if the command name is recognized
-    /// and its required arguments can be parsed.
+    /// Optional arguments are assigned default values when omitted:
+    /// - `--description`: an empty string.
+    /// - `--priority`: `"none"`.
     ///
     /// # Errors
     ///
-    /// Returns [`CommandError::CommandNotFound`] if the command name is unknown,
-    /// or [`CommandError::WrongArgument`] if a required numeric identifier
-    /// cannot be parsed as a `u32`.
+    /// Returns:
+    /// - [`CommandError::CommandNotFound`] if the command is unknown.
+    /// - [`CommandError::ArgumentNotFound`] if a required argument is missing.
+    /// - [`CommandError::InvalidArgument`] if a task ID cannot be parsed as a [`u32`].
     pub fn parse(cmdline: CmdLine) -> Result<Self, CommandError> {
         let args = cmdline.get_args();
         let cmd = match args.get("command") {
@@ -135,7 +125,13 @@ impl Command {
         }
     }
 }
-
+/// Parses a task identifier into an unsigned 32-bit integer.
+///
+/// Leading and trailing whitespace is ignored.
+///
+/// # Errors
+///
+/// Returns [`CommandError::InvalidArgument`] if `id` is not a valid [`u32`] value.
 fn parse_id(id: String) -> Result<u32, CommandError> {
     let id = match id.trim().parse::<u32>() {
         Ok(val) => val,
