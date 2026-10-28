@@ -142,26 +142,46 @@ impl Cli {
         self.task_mgr.complete(id)?;
         Ok(())
     }
-    fn help() {
-        println!("{:<10} {:<24} Description", "Command", "Arguments");
 
-        println!("{}", "-".repeat(80));
+    fn help() {
+        println!("{:<10} {:<52} Description", "Command", "Arguments");
+        println!("{}", "-".repeat(90));
 
         println!(
-            "{:<10} {:<24} Add a new task. The description is optional and defaults to \"Undefined\".",
+            "{:<10} {:<52} Create a new task. --title is required; other arguments are optional.",
             "add",
-            "<title> <priority> [description]"
+            "--title <text> [--description <text>] [--priority <name>]"
         );
 
-        println!("{:<10} {:<24} Display all tasks with their statuses.", "list", "—");
+        println!("{:<10} {:<52} Display all tasks and their completion statuses.", "list", "—");
 
-        println!("{:<10} {:<24} Mark a task as completed by its ID.", "complete", "<id>");
+        println!(
+            "{:<10} {:<52} Display detailed information about a task.",
+            "show",
+            "--id <number>"
+        );
 
-        println!("{:<10} {:<24} Delete a task by its ID", "delete", "<id>");
+        println!("{:<10} {:<52} Mark a task as completed.", "complete", "--id <number>");
 
-        println!("{:<10} {:<24} Display detailed information about a task.", "show", "<id>");
+        println!("{:<10} {:<52} Delete a task.", "delete", "--id <number>");
 
-        println!("{:<10} {:<24} Display the list of available commands.", "help", "—");
-        println!("{:<10} {:<24} Exit the program. Drops all stored information", "exit", "—")
+        println!("{:<10} {:<52} Display the list of available commands.", "help", "—");
+
+        println!("{:<10} {:<52} Exit the program. All stored tasks will be lost.", "exit", "—");
+
+        println!("\nExamples:");
+        println!("  add --title \"Buy milk\"");
+        println!(
+            "  add --title \"Finish project\" --description \"Write documentation\" --priority high"
+        );
+        println!("  list");
+        println!("  show --id 1");
+        println!("  complete --id 1");
+        println!("  delete --id 1");
+
+        println!("\nDefaults for `add`:");
+        println!("  --description: empty string");
+        println!("  --priority:    none");
+        println!("\nValues containing spaces should be enclosed in double quotes.");
     }
 }
