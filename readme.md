@@ -1,38 +1,31 @@
 # TaskManagerCLI
 
-A simple command-line task manager written in Rust. This project is being developed as a learning project to practice Rust fundamentals, error handling, testing, and code organization.
+A command-line task manager written in Rust. It allows you to create tasks, inspect them, track their completion status, and delete them.
 
 ## Features
 
-- Create tasks with a title, description, and priority.
+- Create tasks with a title, optional description, and priority.
 - List all tasks and their completion statuses.
-- Display detailed information about a task.
+- Display detailed information about a task by its ID.
 - Mark tasks as completed.
-- Delete tasks by ID.
-- Validate task titles and priority values.
-- Handle invalid commands and task-related errors.
-- Run automated tests with Cargo.
+- Delete tasks by their IDs.
+- Parse commands using named arguments.
+- Handle quoted values and spaces in command-line input.
+
+> **Note:** Task data is currently stored in memory and is lost when the application exits.
 
 ## Requirements
 
 - [Rust](https://www.rust-lang.org/tools/install)
 - Cargo (included with the Rust toolchain)
 
-The project uses Rust edition 2024.
+## Getting started
 
-## Installation
-
-Clone the repository:
+Clone the repository and navigate to the project directory:
 
 ```bash
 git clone https://github.com/JayStorm228/TaskManagerCLI.git
 cd TaskManagerCLI
-```
-
-Switch to the development branch if you want to use the task-priority feature:
-
-```bash
-git switch feature/task-priority
 ```
 
 Build the project:
@@ -41,41 +34,45 @@ Build the project:
 cargo build
 ```
 
-## Usage
-
-Run the application with:
+Run the application:
 
 ```bash
 cargo run
 ```
 
-The application accepts commands interactively. Enter a command and press Enter to execute it.
+## Commands
 
-### Available commands
+The application accepts commands followed by named arguments.
 
-| Command                                | Description                    |
-| -------------------------------------- | ------------------------------ |
-| `add <title> <priority> [description]` | Create a task                  |
-| `list`                                 | Display all tasks              |
-| `show <id>`                            | Display task details           |
-| `complete <id>`                        | Mark a task as completed       |
-| `delete <id>`                          | Delete a task                  |
-| `help`                                 | Display the available commands |
-| `exit`                                 | Exit the application           |
+| Command    | Arguments        | Description                           |
+| ---------- | ---------------- | ------------------------------------- |
+| `add`      | `--title <text>` | Create a task.                        |
+| `list`     | None             | Display all tasks and their statuses. |
+| `show`     | `--id <number>`  | Display a task's details.             |
+| `complete` | `--id <number>`  | Mark a task as completed.             |
+| `delete`   | `--id <number>`  | Delete a task.                        |
+| `help`     | None             | Display available commands.           |
+| `exit`     | None             | Exit the application.                 |
 
-### Examples
+### Adding a task
 
-Create a task:
-
-```text
-add LearnRust high Read the Rust Book
-```
-
-Create a task without a description:
+A title is required. Description and priority are optional.
 
 ```text
-add Exercise medium
+add --title "Buy groceries"
+add --title "Buy groceries" --description "Milk and bread"
+add --title "Finish project" --priority high
+add --title "Prepare presentation" --description "Slides for the demo" --priority medium
 ```
+
+Default values:
+
+- `--description`: an empty string.
+- `--priority`: `none`.
+
+Values containing spaces should be enclosed in double quotes.
+
+### Working with tasks
 
 Display all tasks:
 
@@ -83,22 +80,28 @@ Display all tasks:
 list
 ```
 
-Display a specific task:
+Show a task by its ID:
 
 ```text
-show 0
+show --id 1
 ```
 
 Mark a task as completed:
 
 ```text
-complete 0
+complete --id 1
 ```
 
 Delete a task:
 
 ```text
-delete 0
+delete --id 1
+```
+
+Display help:
+
+```text
+help
 ```
 
 Exit the application:
@@ -107,65 +110,65 @@ Exit the application:
 exit
 ```
 
-In the `add` command, the title is the first argument, the priority is the second argument, and the remaining arguments form the description.
-
-## Task priorities
-
-Each task can have one of four priority values:
-
-| Priority | Description          |
-| -------- | -------------------- |
-| `low`    | Low priority         |
-| `medium` | Medium priority      |
-| `high`   | High priority        |
-| `none`   | No assigned priority |
-
-Priority names are case-insensitive. For example, `high`, `HIGH`, and `High` are accepted.
-Priority value must be include, if task has description.
-If the priority argument and description is omitted, the parser defaults to `none`.
-
-## Validation and errors
-
-- Task titles must contain at least three Unicode characters.
-- Priority values must match one of the supported options.
-- Task IDs must be valid unsigned 32-bit integers (`u32`).
-- An operation targeting a nonexistent task returns an error.
-- A task cannot be marked as completed more than once.
-
-Task IDs start at `0` and increase after each successful task creation. Deleted IDs are not reused during the current session.
+Task IDs are unsigned integers.
 
 ## Development
 
-Format the code:
+Build the project:
 
 ```bash
-cargo fmt
-```
-
-Check the project for compilation errors:
-
-```bash
-cargo check
+cargo build
 ```
 
 Run the test suite:
 
 ```bash
-cargo test
+cargo test --all-targets
 ```
 
-Generate the Rust documentation:
+Check formatting:
+
+```bash
+cargo fmt --check
+```
+
+Run Clippy:
+
+```bash
+cargo clippy --all-targets -- -D warnings
+```
+
+Build the Rust documentation:
 
 ```bash
 cargo doc --no-deps
 ```
 
-## Current limitations
+To open the generated documentation in a browser:
 
-- Tasks are stored in memory and are lost when the application exits.
-- The command parser uses whitespace to separate arguments, so task titles cannot currently contain spaces.
-- The application does not yet provide persistent storage or a configuration system.
+```bash
+cargo doc --no-deps --open
+```
+
+## Branching and CI
+
+The project uses two main branches:
+
+- **`unstable`** — integration branch for completed features and ongoing development. Intermediate commits are not necessarily expected to represent a fully working product.
+- **`stable`** — branch for a consolidated, working state of the product.
+
+Feature branches should normally be based on `unstable`, and completed features should be proposed for merging into `unstable` through pull requests.
+
+CI runs for pull requests targeting both `unstable` and `stable`. These checks help validate changes before integration; they do not imply that every intermediate commit on a development branch is a release-ready version.
+
+The goal is for **each completed feature to be functional**, even though the development process may include intermediate states that are not yet fully functional.
+
+## Project status
+
+TaskManagerCLI is under active development. Commands, argument parsing, and other behavior may evolve as features are added and integrated.
+
+See [CHANGELOG.md](CHANGELOG.md) for a record of notable changes.
 
 ## License
 
-No license has been specified yet.
+See the repository for license information.
