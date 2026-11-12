@@ -48,6 +48,46 @@ pub enum Command {
 }
 
 impl Command {
+    /// Validates provided command
+    ///
+    /// # Arguments
+    ///
+    /// - `cmdline` (`&CmdLine`) - Describe this parameter.
+    /// - `allowed_args` (`&[&str]`) - Describe this parameter.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), CommandError>` - Describe the return value.
+    ///
+    /// # Errors
+    ///
+    /// Describe possible errors.
+    fn validate_argument_names(
+        cmdline: &CmdLine,
+        allowed_args: &[&str]
+    ) -> Result<(), CommandError> {
+        let not_allowed_args: Vec<&str> = cmdline
+            .get_args()
+            .keys()
+            .map(String::as_str)
+            .filter(|v| *v != "command")
+            .filter(|arg| !allowed_args.contains(arg))
+            .collect();
+
+        if !not_allowed_args.is_empty() {
+            let allowed_args: String = allowed_args.join(", ");
+
+            let msg = format!(
+                "Invalid arguments found!\nAllowed: {}\nInvalid: {}",
+                allowed_args,
+                not_allowed_args.join(", ")
+            );
+
+            return Err(CommandError::InvalidArgument(msg));
+        }
+
+        Ok(())
+    }
     /// Parses a command from the provided [`CmdLine`].
     ///
     /// Converts the command name and its arguments into a corresponding
@@ -62,7 +102,7 @@ impl Command {
     /// Returns:
     /// - [`CommandError::CommandNotFound`] if the command is unknown.
     /// - [`CommandError::ArgumentNotFound`] if a required argument is missing.
-    /// - [`CommandError::InvalidArgument`] if a task ID cannot be parsed as a [`u32`].
+    /// - [`CommandError::InvalidArgument`] if a task ID cannot be parsed as a [`u32`]
     pub fn parse(cmdline: CmdLine) -> Result<Self, CommandError> {
         let args = cmdline.get_args();
         let cmd = match args.get("command") {
@@ -72,6 +112,8 @@ impl Command {
 
         match cmd.as_str() {
             "add" => {
+                let allowed_args = ["--priority", "--title", "--description"];
+                Command::validate_argument_names(&cmdline, &allowed_args)?;
                 let title = match args.get("--title") {
                     Some(title) => title.clone(),
                     None => {
@@ -89,6 +131,8 @@ impl Command {
                 Ok(Command::Add { title, description, priority })
             }
             "show" => {
+                let allowed_args = ["--id"];
+                Command::validate_argument_names(&cmdline, &allowed_args)?;
                 let id = match args.get("--id") {
                     Some(id) => id.clone(),
                     None => {
@@ -99,6 +143,8 @@ impl Command {
                 Ok(Command::Show { id })
             }
             "delete" => {
+                let allowed_args = ["--id"];
+                Command::validate_argument_names(&cmdline, &allowed_args)?;
                 let id = match args.get("--id") {
                     Some(id) => id.clone(),
                     None => {
@@ -109,6 +155,8 @@ impl Command {
                 Ok(Command::Delete { id })
             }
             "complete" => {
+                let allowed_args = ["--id"];
+                Command::validate_argument_names(&cmdline, &allowed_args)?;
                 let id = match args.get("--id") {
                     Some(id) => id.clone(),
                     None => {
@@ -118,9 +166,21 @@ impl Command {
                 let id = parse_id(id)?;
                 Ok(Command::Complete { id })
             }
-            "list" => Ok(Self::List),
-            "help" => Ok(Self::Help),
-            "exit" => Ok(Self::Exit),
+            "list" => {
+                let allowed_args = [];
+                Command::validate_argument_names(&cmdline, &allowed_args)?;
+                Ok(Self::List)
+            }
+            "help" => {
+                let allowed_args = [];
+                Command::validate_argument_names(&cmdline, &allowed_args)?;
+                Ok(Self::Help)
+            }
+            "exit" => {
+                let allowed_args = [];
+                Command::validate_argument_names(&cmdline, &allowed_args)?;
+                Ok(Self::Exit)
+            }
             _ => Err(CommandError::CommandNotFound(cmd.to_string())),
         }
     }
