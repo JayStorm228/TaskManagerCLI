@@ -105,7 +105,10 @@ impl CmdLine {
             let Some(value) = tokens.get(index + 1) else {
                 return Err(CmdLineError::MissingArgumentValue(argument.clone()));
             };
-
+            if value.starts_with("--") {
+                let arg_value = (argument.clone(), value.clone());
+                return Err(CmdLineError::InvalidArgumentValue(arg_value));
+            }
             if parsed.insert(argument.clone(), value.clone()).is_some() {
                 return Err(CmdLineError::DuplicateArgument(argument.clone()));
             }

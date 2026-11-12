@@ -67,6 +67,10 @@ pub enum CmdLineError {
     /// An unexpected token follows the command and doesn't start with `--`
     InvalidArgument(String),
 
+    /// An argument value is missing, or an argument with no value
+    /// is immediately followed by another argument.
+    InvalidArgumentValue((String, String)),
+
     /// a trailing backslash has no character to escape
     UnterminatedEscapeSequence(String),
 }
@@ -93,6 +97,11 @@ impl fmt::Display for CmdLineError {
             Self::UnterminatedEscapeSequence(input) => {
                 write!(f, "Unterminated escape sequence found in command line:\n{input}")
             }
+            Self::InvalidArgumentValue((argument, value)) =>
+                write!(
+                    f,
+                    "Invalid value for argument '{argument}': '{value}'. \nThe value may be missing, or a valueless argument may be immediately followed by another argument."
+                ),
         }
     }
 }
